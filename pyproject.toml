@@ -18,6 +18,8 @@ pyarrow = "^15.0.1"
 transformers = "^4.38.2"
 duckdb = "^0.10.0"
 quadprog = "^0.1.12"
+matplotlib = "^3.8.3"
+scikit-learn = "^1.4.1.post1"
 
 
 [[tool.poetry.source]]
