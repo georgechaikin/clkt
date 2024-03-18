@@ -64,7 +64,7 @@ def match_seq_len(q_seqs, r_seqs, seq_len, pad_val=-1):
     return proc_q_seqs, proc_r_seqs
 
 
-def collate_fn(batch, pad_val=-1):
+def collate_fn(batch, pad_val=-1, return_task=True):
     '''
         The collate function for torch.utils.data.DataLoader
 
@@ -88,12 +88,17 @@ def collate_fn(batch, pad_val=-1):
     qshft_seqs = []
     rshft_seqs = []
     task_seqs = []
-    for q_seq, r_seq, task_id in batch:
+    for data in batch:
+        if return_task:
+            q_seq, r_seq, task_id = data
+            task_seqs.append(task_id)
+        else:
+            q_seq, r_seq = data
         q_seqs.append(torch.Tensor(q_seq[:-1]))
         r_seqs.append(torch.Tensor(r_seq[:-1]))
         qshft_seqs.append(torch.Tensor(q_seq[1:]))
         rshft_seqs.append(torch.Tensor(r_seq[1:]))
-        task_seqs.append(task_id)
+
     q_seqs = pad_sequence(
         q_seqs, batch_first=True, padding_value=pad_val
     )
@@ -116,4 +121,8 @@ def collate_fn(batch, pad_val=-1):
     y = torch.masked_select(rshft_seqs, mask_seqs)
     x = torch.stack((q_seqs.long(), r_seqs.long(), qshft_seqs.long(), mask_seqs))
     # x = torch.stack((q_seqs, r_seqs, qshft_seqs, mask_seqs))
-    return x, y, torch.Tensor(task_seqs)
+    # x = torch.stack((q_seqs, r_seqs, qshft_seqs, mask_seqs))
+    if return_task:
+        return x, y, torch.Tensor(task_seqs)
+    else:
+        return x, y
