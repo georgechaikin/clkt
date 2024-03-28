@@ -47,5 +47,5 @@ class ConfigFile:
         return self.config.get(item, None)
 
 
-sys_config_path = Path(__file__) / 'config.yaml'
+sys_config_path = Path(__file__).parent / 'config.yaml'
 sys_config = ConfigFile(sys_config_path)

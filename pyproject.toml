@@ -38,5 +38,6 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry.scripts]
-clkt-run = "clkt.main:main"
-data-preprocess = "clkt.data_preprocess:main"
+run_cl = "clkt.examples.run_cl:run_experiments"
+#clkt-run = "clkt.main:main"
+#data-preprocess = "clkt.data_preprocess:main"

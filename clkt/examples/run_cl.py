@@ -3,21 +3,23 @@ The script is used to show the example of Avalance continual learning process us
 """
 
 import os
+import random
 from functools import partial
 from pathlib import Path
-from random import random
 from typing import Union
 
 import click
 import numpy as np
 import torch
 import wandb
+from avalanche.benchmarks import benchmark_from_datasets, task_incremental_benchmark, AvalancheDataset
 from avalanche.training import EWC, Naive, Cumulative, Replay, FromScratchTraining
 from torch.nn.functional import binary_cross_entropy
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torch.utils.data import random_split
 
+from clkt.config import ConfigFile
 from clkt.datasets.assist2009 import ASSIST2009
 from clkt.datasets.utils import collate_fn
 from clkt.datasets.utils import get_datasets, random_datasets_split
@@ -26,7 +28,7 @@ from clkt.models.sakt import SAKT
 from clkt.models.utils import get_eval_metrics
 
 
-def run_experiment(cl_strategy, model, test_loaders, test_loader, config_args):
+def run_experiment(cl_strategy, model, train_stream, test_loaders, test_loader, config_args):
     """Runs the experiment for defined CL strategy.
 
     Args:
@@ -38,8 +40,8 @@ def run_experiment(cl_strategy, model, test_loaders, test_loader, config_args):
         config_args:
 
     """
+
     wandb.init(project='clkt-experiments', config=config_args)
-    train_stream = cl_strategy.values['train']
     # Run CL tasks.
     for train_task in train_stream:
         model.train()
@@ -78,13 +80,13 @@ def manual_seed(seed: int) -> None:
 
 @click.command()
 @click.option('--data-path', type=click.Path(exists=True), default='data/assist2009/skill_builder_data.csv',
-              description='Assitments2009 data path.')
+              help='Assitments2009 data path.')
 @click.option('--config', type=click.Path(exists=True),
               default=Path(__file__).parent / 'config' / 'run_cl_config.yaml',
-              description='Config file with parameters.')
+              help='Config file with parameters.')
 def run_experiments(data_path: Union[str, os.PathLike], config=Union[str, os.PathLike]):
     """Runs the Continual learning experiment with some Avalanche strategies and knowledge tracing model."""
-    # config = ConfigFile(config)
+    config_args = ConfigFile(config).config
     device = torch.device('cpu')
 
     seed = 0
@@ -102,6 +104,10 @@ def run_experiments(data_path: Union[str, os.PathLike], config=Union[str, os.Pat
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size], generator=g)
     train_datasets = get_datasets(train_dataset, split_ratio=0.1, generator=g)
     train_datasets, test_datasets = random_datasets_split(train_datasets, 0.9, generator=g)
+    train_datasets = [AvalancheDataset(ds, collate_fn=collate_fn) for ds in train_datasets]
+    bm = benchmark_from_datasets(train=train_datasets)
+    bm = task_incremental_benchmark(bm)
+    train_stream = bm.streams['train']
 
     # Set test loaders
     test_loader = DataLoader(test_dataset, batch_size=len(test_dataset),
@@ -141,4 +147,4 @@ def run_experiments(data_path: Union[str, os.PathLike], config=Union[str, os.Pat
     strategies = [from_scratch, naive, ewc, replay, cumulative]
 
     for strategy in strategies:
-        run_experiment(strategy, train_datasets, test_loaders, test_loader)
+        run_experiment(strategy, model, train_stream, test_loaders, test_loader, config_args)
