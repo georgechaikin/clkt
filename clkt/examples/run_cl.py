@@ -82,7 +82,7 @@ def manual_seed(seed: int) -> None:
 @click.option('--data-path', type=click.Path(exists=True), default='data/assist2009/skill_builder_data.csv',
               help='Assitments2009 data path.')
 @click.option('--config', type=click.Path(exists=True),
-              default=Path(__file__).parent / 'config' / 'run_cl_config.yaml',
+              default=Path(__file__).parent / 'config' / 'run_cl.yaml',
               help='Config file with parameters.')
 def run_experiments(data_path: Union[str, os.PathLike], config=Union[str, os.PathLike]):
     """Runs the Continual learning experiment with some Avalanche strategies and knowledge tracing model."""

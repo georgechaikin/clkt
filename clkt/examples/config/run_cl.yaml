@@ -1,5 +1,8 @@
 device: cpu
 
+# wandb parameters
+project: clkt-experiments
+
 # Train parameters
 seed: 0
 epochs: 10
