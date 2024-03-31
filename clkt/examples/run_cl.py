@@ -30,7 +30,7 @@ from clkt.models.sakt import SAKT
 from clkt.models.utils import get_eval_metrics
 
 
-def run_experiment(cl_strategy: SupervisedTemplate, model: torch.Module, train_stream: TCLStream,
+def run_experiment(cl_strategy: SupervisedTemplate, model: torch.nn.Module, train_stream: TCLStream,
                    test_loaders: Iterable[DataLoader], test_loader: DataLoader,
                    config_args: Dict[str, YAMLType]) -> None:
     """Runs the experiment for the specific CL strategy.
@@ -44,8 +44,10 @@ def run_experiment(cl_strategy: SupervisedTemplate, model: torch.Module, train_s
         config_args: Config parameters for wandb logging.
 
     """
-
-    wandb.init(project='clkt-experiments', config=config_args)
+    config_args = config_args.copy()
+    print(config_args)
+    config_args['strategy'] = str(cl_strategy)
+    wandb.init(project=config_args['project'], config=config_args)
     # Run CL tasks.
     for train_task in train_stream:
         model.train()
@@ -137,18 +139,14 @@ def run_experiments(data_path: Union[str, os.PathLike], config=Union[str, os.Pat
     from_scratch = FromScratchTraining(model, optimizer, criterion, train_mb_size=batch_size, train_epochs=epochs,
                                        device=device)
 
-    naive = Naive(model, optimizer, criterion, train_mb_size=batch_size, train_epochs=epochs, eval_mb_size=32,
-                  device=device)
+    naive = Naive(model, optimizer, criterion, train_mb_size=batch_size, train_epochs=epochs, device=device)
 
-    ewc = EWC(model, optimizer, criterion, ewc_lambda=config.ewc_lambda, train_mb_size=batch_size, train_epochs=epochs,
-              eval_mb_size=32, device=device)
+    ewc = EWC(model, optimizer, criterion, ewc_lambda=config_args.ewc_lambda, train_mb_size=batch_size,
+              train_epochs=epochs, device=device)
 
-    cumulative = Cumulative(model, optimizer, criterion, train_mb_size=config_args['batch_size'],
-                            train_epochs=config_args['epochs'], device=device)
+    cumulative = Cumulative(model, optimizer, criterion, train_mb_size=batch_size, train_epochs=epochs, device=device)
 
-    replay = Replay(model, optimizer, criterion, train_mb_size=config_args['batch_size'],
-                    train_epochs=config_args['epochs'],
-                    eval_mb_size=32, device=device)
+    replay = Replay(model, optimizer, criterion, train_mb_size=batch_size, train_epochs=epochs, device=device)
 
     strategies = [from_scratch, naive, ewc, replay, cumulative]
 
