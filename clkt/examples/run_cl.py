@@ -105,7 +105,7 @@ def run_experiments(data_path: Union[str, os.PathLike], config=Union[str, os.Pat
 
     # Set datasets.
     dataset_path = Path(data_path)
-    dataset = ASSIST2009(100, dataset_path)
+    dataset = ASSIST2009(config_args.seq_len, dataset_path)
 
     train_ratio = config_args.train_ratio
     split_ratio = config_args.split_ratio
