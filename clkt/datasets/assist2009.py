@@ -1,9 +1,11 @@
 import os
 import pickle
 from pathlib import Path
+from typing import Tuple, List
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 from torch.utils.data import Dataset
 
 from clkt.datasets.utils import match_seq_len
