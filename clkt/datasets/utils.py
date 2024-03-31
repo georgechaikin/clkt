@@ -125,7 +125,7 @@ def collate_fn(batch, pad_val=-1, return_task=True):
 
 
 def get_datasets(ds: Dataset, split_ratio: float, generator: torch.Generator) -> List[Dataset]:
-    """Splits dataset corresponding split_ratio
+    """Splits the dataset into the list of datasets with corresponding split_ratio.
 
     Args:
         ds: dataset for split.

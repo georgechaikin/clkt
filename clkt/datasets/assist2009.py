@@ -11,6 +11,12 @@ from clkt.datasets.utils import match_seq_len
 
 class ASSIST2009(Dataset):
     def __init__(self, seq_len, dataset_path) -> None:
+        """Initializes the instance.
+
+        Args:
+            seq_len: Sequence length for each student for union batch formation.
+            dataset_path: Dataset path.
+        """
         super().__init__()
 
         dataset_path = Path(dataset_path)
@@ -43,15 +49,18 @@ class ASSIST2009(Dataset):
 
         self.len = len(self.q_seqs)
 
-    # def __getitem__(self, index):
-    #     return self.q_seqs[index], self.r_seqs[index]
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> Tuple[List, NDArray]:
         return self.q_seqs[index], np.array(self.r_seqs[index])
 
     def __len__(self):
         return self.len
 
-    def preprocess(self):
+    def preprocess(self) -> Tuple[List, List, List, List, List, List]:
+        """ASSISTMENTS2009 preprocess.
+
+        Returns:
+            ASSISTMENTS2009 features.
+        """
         df = pd.read_csv(self.dataset_path, encoding='latin').dropna(subset=["skill_name"]) \
             .drop_duplicates(subset=["order_id", "skill_name"]) \
             .sort_values(by=["order_id"])
