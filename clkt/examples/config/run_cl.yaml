@@ -1,0 +1,15 @@
+device: cpu
+
+# wandb parameters
+project: clkt-experiments
+
+# Train parameters
+seed: 0
+epochs: 10
+batch_size: 256
+seq_len: 100
+train_ratio: 0.9
+split_ratio: 0.1
+
+# Special params for CL strategies.
+ewc_lambda: 0.1
