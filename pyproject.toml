@@ -2,24 +2,16 @@
 name = "clkt"
 version = "0.1.0"
 description = "Continual Learning with knowledge tracing and sequential data"
-authors = ["George Chaikin <chaykin.georgiy217@gmail.com>"]
+authors = ["Georgii Chaikin <chaykin.georgiy217@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-torch = {version = "^1.12.1+cu116", source = "pytorch-gpu-src"}
+torch = { version = "^1.12.1+cu116", source = "pytorch-gpu-src" }
 tqdm = "^4.66.2"
-avalanche-lib = {extras = ["extra"], version = "^0.5.0"}
+avalanche-lib = { extras = ["extra"], version = "^0.5.0" }
 click = "^8.1.7"
-qpsolvers = {extras = ["open-source-solvers"], version = "^4.3.1"}
-pytorch-lifestream = "^0.5.3"
 pandas = "<2.2.1"
-pyarrow = "^15.0.1"
-transformers = "^4.38.2"
-duckdb = "^0.10.0"
-quadprog = "^0.1.12"
-matplotlib = "^3.8.3"
-scikit-learn = "^1.4.1.post1"
 
 
 [[tool.poetry.source]]
@@ -31,6 +23,7 @@ priority = "explicit"
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.1.4"
 jupyterlab-execute-time = "^3.1.2"
+mypy = "^1.9.0"
 
 [build-system]
 requires = ["poetry-core"]
