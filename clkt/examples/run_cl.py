@@ -45,7 +45,6 @@ def run_experiment(cl_strategy: SupervisedTemplate, model: torch.nn.Module, trai
 
     """
     config_args = config_args.copy()
-    print(config_args)
     config_args['strategy'] = str(cl_strategy)
     wandb.init(project=config_args['project'], config=config_args)
     # Run CL tasks.
